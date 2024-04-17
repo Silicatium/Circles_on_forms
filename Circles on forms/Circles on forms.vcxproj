@@ -123,6 +123,7 @@
     <ClCompile Include="CirclesPaint.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CCircle.h" />
     <ClInclude Include="CirclesPaint.h">
       <FileType>CppForm</FileType>
     </ClInclude>

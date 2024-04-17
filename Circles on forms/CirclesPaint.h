@@ -1,4 +1,5 @@
 #pragma once
+#include "CCircle.h"
 
 namespace CirclesOnForms {
 
@@ -35,7 +36,6 @@ namespace CirclesOnForms {
 	private: System::Windows::Forms::CheckBox^ checkBoxCtrlEnabling;
 	private: System::Windows::Forms::CheckBox^ checkBoxIntersactionSelecting;
 	private: System::Windows::Forms::PictureBox^ PaintBox;
-
 
 	private:
 		/// <summary>
@@ -91,6 +91,7 @@ namespace CirclesOnForms {
 			this->PaintBox->Size = System::Drawing::Size(763, 503);
 			this->PaintBox->TabIndex = 2;
 			this->PaintBox->TabStop = false;
+			this->PaintBox->MouseClick += gcnew System::Windows::Forms::MouseEventHandler(this, &CirclesPaint::PaintBox_MouseClick);
 			// 
 			// CirclesPaint
 			// 
@@ -103,27 +104,33 @@ namespace CirclesOnForms {
 			this->Controls->Add(this->checkBoxCtrlEnabling);
 			this->Name = L"CirclesPaint";
 			this->Text = L"Circles Paint";
+			this->FormClosing += gcnew System::Windows::Forms::FormClosingEventHandler(this, &CirclesPaint::CirclesPaint_FormClosing);
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->PaintBox))->EndInit();
 			this->ResumeLayout(false);
 			this->PerformLayout();
 
 		}
 #pragma endregion
-	};
+		int size = 0;
+		CCircle* arr = new CCircle[size];
 
-	class CCircle {
-	private:
-		int x;
-		int y;
-		const int radius = 45;
-	public:
-		CCircle() : x(0), y(0) {};
-		CCircle(int x, int y) : x(x), y(y) {};
-		CCircle(const CCircle& c) : x(c.x), y(c.y) {};
-		~CCircle() {
-			x = 0;
-			y = 0;
-		};
-
+	private: System::Void CirclesPaint_FormClosing(System::Object^ sender, System::Windows::Forms::FormClosingEventArgs^ e) {
+		delete[] arr;
+	}
+	private: System::Void PaintBox_MouseClick(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
+		CCircle circle(e->X, e->Y);
+		size++;
+		CCircle* temp = new CCircle[size];
+		for (int i = 0; i < size - 1; i++) {
+			temp[i] = arr[i];
+		}
+		temp[size - 1] = circle;
+		delete[] arr;
+		arr = new CCircle[size];
+		for (int i = 0; i < size; i++) {
+			arr[i] = temp[i];
+		}
+		delete[] temp;
+	}
 	};
 }
