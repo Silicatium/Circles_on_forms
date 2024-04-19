@@ -9,6 +9,7 @@ namespace CirclesOnForms {
 	using namespace System::Windows::Forms;
 	using namespace System::Data;
 	using namespace System::Drawing;
+	using namespace System::Collections::Generic;
 
 	/// <summary>
 	/// Сводка для CirclesPaint
@@ -35,7 +36,8 @@ namespace CirclesOnForms {
 		}
 	private: System::Windows::Forms::CheckBox^ checkBoxCtrlEnabling;
 	private: System::Windows::Forms::CheckBox^ checkBoxIntersactionSelecting;
-	private: System::Windows::Forms::PictureBox^ PaintBox;
+	private: System::Windows::Forms::PictureBox^ paintBox;
+
 
 	private:
 		/// <summary>
@@ -51,8 +53,8 @@ namespace CirclesOnForms {
 		void InitializeComponent(void) {
 			this->checkBoxCtrlEnabling = (gcnew System::Windows::Forms::CheckBox());
 			this->checkBoxIntersactionSelecting = (gcnew System::Windows::Forms::CheckBox());
-			this->PaintBox = (gcnew System::Windows::Forms::PictureBox());
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->PaintBox))->BeginInit();
+			this->paintBox = (gcnew System::Windows::Forms::PictureBox());
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->paintBox))->BeginInit();
 			this->SuspendLayout();
 			// 
 			// checkBoxCtrlEnabling
@@ -79,19 +81,20 @@ namespace CirclesOnForms {
 			this->checkBoxIntersactionSelecting->Text = L"Selecting all objects at the intersection";
 			this->checkBoxIntersactionSelecting->UseVisualStyleBackColor = true;
 			// 
-			// PaintBox
+			// paintBox
 			// 
-			this->PaintBox->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Bottom)
+			this->paintBox->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Bottom)
 				| System::Windows::Forms::AnchorStyles::Left)
 				| System::Windows::Forms::AnchorStyles::Right));
-			this->PaintBox->BackColor = System::Drawing::Color::White;
-			this->PaintBox->BorderStyle = System::Windows::Forms::BorderStyle::FixedSingle;
-			this->PaintBox->Location = System::Drawing::Point(12, 38);
-			this->PaintBox->Name = L"PaintBox";
-			this->PaintBox->Size = System::Drawing::Size(763, 503);
-			this->PaintBox->TabIndex = 2;
-			this->PaintBox->TabStop = false;
-			this->PaintBox->MouseClick += gcnew System::Windows::Forms::MouseEventHandler(this, &CirclesPaint::PaintBox_MouseClick);
+			this->paintBox->BackColor = System::Drawing::Color::White;
+			this->paintBox->BorderStyle = System::Windows::Forms::BorderStyle::FixedSingle;
+			this->paintBox->Location = System::Drawing::Point(12, 38);
+			this->paintBox->Name = L"paintBox";
+			this->paintBox->Size = System::Drawing::Size(763, 503);
+			this->paintBox->TabIndex = 2;
+			this->paintBox->TabStop = false;
+			this->paintBox->Paint += gcnew System::Windows::Forms::PaintEventHandler(this, &CirclesPaint::PaintBox_Paint);
+			this->paintBox->MouseClick += gcnew System::Windows::Forms::MouseEventHandler(this, &CirclesPaint::PaintBox_MouseClick);
 			// 
 			// CirclesPaint
 			// 
@@ -99,38 +102,27 @@ namespace CirclesOnForms {
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->BackColor = System::Drawing::Color::GhostWhite;
 			this->ClientSize = System::Drawing::Size(787, 553);
-			this->Controls->Add(this->PaintBox);
+			this->Controls->Add(this->paintBox);
 			this->Controls->Add(this->checkBoxIntersactionSelecting);
 			this->Controls->Add(this->checkBoxCtrlEnabling);
 			this->Name = L"CirclesPaint";
 			this->Text = L"Circles Paint";
-			this->FormClosing += gcnew System::Windows::Forms::FormClosingEventHandler(this, &CirclesPaint::CirclesPaint_FormClosing);
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->PaintBox))->EndInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->paintBox))->EndInit();
 			this->ResumeLayout(false);
 			this->PerformLayout();
 
 		}
 #pragma endregion
-		int size = 0;
-		CCircle* arr = new CCircle[size];
+		List<CCircle^>^ circles = gcnew List<CCircle^>;
 
-	private: System::Void CirclesPaint_FormClosing(System::Object^ sender, System::Windows::Forms::FormClosingEventArgs^ e) {
-		delete[] arr;
-	}
 	private: System::Void PaintBox_MouseClick(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
-		CCircle circle(e->X, e->Y);
-		size++;
-		CCircle* temp = new CCircle[size];
-		for (int i = 0; i < size - 1; i++) {
-			temp[i] = arr[i];
-		}
-		temp[size - 1] = circle;
-		delete[] arr;
-		arr = new CCircle[size];
-		for (int i = 0; i < size; i++) {
-			arr[i] = temp[i];
-		}
-		delete[] temp;
+		circles->Add(gcnew CCircle(e->X, e->Y));
+		paintBox->Invalidate();
 	}
-	};
+	private: System::Void PaintBox_Paint(System::Object^ sender, System::Windows::Forms::PaintEventArgs^ e) {
+		for each (CCircle^ circle in circles) {
+			circle->draw(paintBox);
+		}
+	}
+};
 }
