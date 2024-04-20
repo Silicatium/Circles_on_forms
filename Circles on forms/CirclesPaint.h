@@ -95,6 +95,7 @@ namespace CirclesOnForms {
 			this->paintBox->TabStop = false;
 			this->paintBox->Paint += gcnew System::Windows::Forms::PaintEventHandler(this, &CirclesPaint::PaintBox_Paint);
 			this->paintBox->MouseClick += gcnew System::Windows::Forms::MouseEventHandler(this, &CirclesPaint::PaintBox_MouseClick);
+			this->paintBox->MouseMove += gcnew System::Windows::Forms::MouseEventHandler(this, &CirclesPaint::paintBox_MouseMove);
 			// 
 			// CirclesPaint
 			// 
@@ -107,6 +108,8 @@ namespace CirclesOnForms {
 			this->Controls->Add(this->checkBoxCtrlEnabling);
 			this->Name = L"CirclesPaint";
 			this->Text = L"Circles Paint";
+			this->KeyPreview = true;
+			this->KeyDown += gcnew System::Windows::Forms::KeyEventHandler(this, &CirclesPaint::CirclesPaint_KeyDown);
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->paintBox))->EndInit();
 			this->ResumeLayout(false);
 			this->PerformLayout();
@@ -116,13 +119,44 @@ namespace CirclesOnForms {
 		List<CCircle^>^ circles = gcnew List<CCircle^>;
 
 	private: System::Void PaintBox_MouseClick(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
-		circles->Add(gcnew CCircle(e->X, e->Y));
-		paintBox->Invalidate();
+		bool check_act = false;
+		CCircle^ object;
+		for each (CCircle ^ circle in circles) {
+			if (circle->remove()) {
+				object = circle;
+				check_act = true;
+			}
+		}
+		if (check_act) {
+			if (object->color == Color::Black) object->color = Color::Blue;
+			else object->color = Color::Black;
+		}
+		else {
+			circles->Add(gcnew CCircle(e->X, e->Y));
+			paintBox->Invalidate();
+		}
 	}
 	private: System::Void PaintBox_Paint(System::Object^ sender, System::Windows::Forms::PaintEventArgs^ e) {
+		Bitmap^ b = gcnew Bitmap(paintBox->Width, paintBox->Height);
+	
 		for each (CCircle^ circle in circles) {
-			circle->draw(paintBox);
+			circle->draw(paintBox, b);
 		}
+	}
+	private: System::Void paintBox_MouseMove(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
+		for each (CCircle^ circle in circles) {
+			circle->send_mouse_coords(e->X, e->Y);
+		}
+	}
+	private: System::Void CirclesPaint_KeyDown(System::Object^ sender, System::Windows::Forms::KeyEventArgs^ e) {
+		CCircle^ object;
+		checkBoxCtrlEnabling->Checked = true;
+		for each (CCircle ^ circle in circles) {
+			if (circle->color == Color::Blue) {
+				object = circle;
+			}
+		}
+		circles->Remove(object);
 	}
 };
 }
