@@ -131,17 +131,15 @@ namespace CirclesOnForms {
 			if (object->color == Color::Black) object->color = Color::Blue;
 			else object->color = Color::Black;
 		}
-		else {
-			circles->Add(gcnew CCircle(e->X, e->Y));
-			paintBox->Invalidate();
-		}
+		else circles->Add(gcnew CCircle(e->X, e->Y));
+		paintBox->Invalidate();
 	}
 	private: System::Void PaintBox_Paint(System::Object^ sender, System::Windows::Forms::PaintEventArgs^ e) {
 		Bitmap^ b = gcnew Bitmap(paintBox->Width, paintBox->Height);
-	
 		for each (CCircle^ circle in circles) {
 			circle->draw(paintBox, b);
 		}
+		if (circles->Count == 0 && paintBox->Image != nullptr) paintBox->Image = b;
 	}
 	private: System::Void paintBox_MouseMove(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
 		for each (CCircle^ circle in circles) {
@@ -150,7 +148,6 @@ namespace CirclesOnForms {
 	}
 	private: System::Void CirclesPaint_KeyDown(System::Object^ sender, System::Windows::Forms::KeyEventArgs^ e) {
 		CCircle^ object;
-		checkBoxCtrlEnabling->Checked = true;
 		for each (CCircle ^ circle in circles) {
 			if (circle->color == Color::Blue) {
 				object = circle;
