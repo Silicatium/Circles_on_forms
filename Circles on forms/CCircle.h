@@ -44,4 +44,7 @@ public:
 	bool check_selected() {
 		return selected;
 	}
+	bool circles_intersect(CCircle^ c) {
+		return (sqrt(pow(x - c->x, 2) + pow(y - c->y, 2))) <= radius + c->radius;
+	}
 };

@@ -121,12 +121,10 @@ namespace CirclesOnForms {
 		bool ctrlPressed = false;
 
 	private: System::Void PaintBox_MouseClick(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
-		int countOfUnselected = 0;
 		int countList = circles->Count;
 		bool check_act = false;
 		List<CCircle^>^ objects = gcnew List<CCircle^>;
 		for each (CCircle ^ circle in circles) {
-			if (!circle->check_selected()) countOfUnselected++;
 			if (circle->check_entry()) {
 				if (!checkBoxIntersactionSelecting->Checked) objects->Clear();
 				objects->Add(circle);
@@ -135,11 +133,12 @@ namespace CirclesOnForms {
 		}
 		if (check_act) {
 			for each (CCircle ^ object in objects) {
-				if (object->check_selected() && countList > countOfUnselected + 1) {
+				circles->Remove(object);
+				circles->Add(object);
+				if (object->check_selected() && ctrlPressed) {
 					object->clicked();
-					countOfUnselected++;
 				}
-				else if (!object->check_selected()) {
+				else {
 					if (!ctrlPressed) {
 						for each (CCircle ^ circle in circles) {
 							if (circle->check_selected()) circle->clicked();
@@ -163,6 +162,7 @@ namespace CirclesOnForms {
 			circle->draw(paintBox, b);
 		}
 		if (circles->Count == 0 && paintBox->Image != nullptr) paintBox->Image = b;
+		one_selected();
 	}
 	private: System::Void paintBox_MouseMove(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
 		for each (CCircle^ circle in circles) {
@@ -172,15 +172,12 @@ namespace CirclesOnForms {
 	private: System::Void CirclesPaint_KeyDown(System::Object^ sender, System::Windows::Forms::KeyEventArgs^ e) {
 		if (e->KeyCode == Keys::Delete) {
 			List<CCircle^>^ selectedCircles = gcnew List<CCircle^>;
-			CCircle^ object;
 			for each (CCircle ^ circle in circles) {
 				if (circle->check_selected()) selectedCircles->Add(circle);
-				else object = circle;
 			}
 			for each (CCircle ^ circle in selectedCircles) {
 				circles->Remove(circle);
 			}
-			if (object != nullptr) object->clicked();
 		}
 		if (checkBoxCtrlEnabling->Checked) {
 			if (e->KeyCode == Keys::ControlKey) ctrlPressed = true;
@@ -188,6 +185,15 @@ namespace CirclesOnForms {
 	}
 	private: System::Void CirclesPaint_KeyUp(System::Object^ sender, System::Windows::Forms::KeyEventArgs^ e) {
 		if (ctrlPressed && e->KeyCode == Keys::ControlKey) ctrlPressed = false;
+	}
+	private: void one_selected() {
+		CCircle^ object;
+		int countOfSelected = 0;
+		for each (CCircle ^ circle in circles) {
+			if (!circle->check_selected()) object = circle;
+			else countOfSelected++;
+		}
+		if (object != nullptr && countOfSelected == 0) object->clicked();
 	}
 	};
 }
