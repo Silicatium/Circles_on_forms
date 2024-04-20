@@ -106,10 +106,11 @@ namespace CirclesOnForms {
 			this->Controls->Add(this->paintBox);
 			this->Controls->Add(this->checkBoxIntersactionSelecting);
 			this->Controls->Add(this->checkBoxCtrlEnabling);
+			this->KeyPreview = true;
 			this->Name = L"CirclesPaint";
 			this->Text = L"Circles Paint";
-			this->KeyPreview = true;
 			this->KeyDown += gcnew System::Windows::Forms::KeyEventHandler(this, &CirclesPaint::CirclesPaint_KeyDown);
+			this->KeyUp += gcnew System::Windows::Forms::KeyEventHandler(this, &CirclesPaint::CirclesPaint_KeyUp);
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->paintBox))->EndInit();
 			this->ResumeLayout(false);
 			this->PerformLayout();
@@ -117,22 +118,44 @@ namespace CirclesOnForms {
 		}
 #pragma endregion
 		List<CCircle^>^ circles = gcnew List<CCircle^>;
+		bool ctrlPressed = false;
 
 	private: System::Void PaintBox_MouseClick(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
+		int countOfUnselected = 0;
+		int countList = circles->Count;
 		bool check_act = false;
-		CCircle^ object;
+		List<CCircle^>^ objects = gcnew List<CCircle^>;
 		for each (CCircle ^ circle in circles) {
-			if (circle->remove()) {
-				object = circle;
+			if (!circle->check_selected()) countOfUnselected++;
+			if (circle->check_entry()) {
+				if (!checkBoxIntersactionSelecting->Checked) objects->Clear();
+				objects->Add(circle);
 				check_act = true;
 			}
 		}
 		if (check_act) {
-			if (object->color == Color::Black) object->color = Color::Blue;
-			else object->color = Color::Black;
+			for each (CCircle ^ object in objects) {
+				if (object->check_selected() && countList > countOfUnselected + 1) {
+					object->clicked();
+					countOfUnselected++;
+				}
+				else if (!object->check_selected()) {
+					if (!ctrlPressed) {
+						for each (CCircle ^ circle in circles) {
+							if (circle->check_selected()) circle->clicked();
+						}
+					}
+					object->clicked();
+				}
+			}
 		}
-		else circles->Add(gcnew CCircle(e->X, e->Y));
-		paintBox->Invalidate();
+		else {
+			for each (CCircle ^ circle in circles) {
+				if (circle->check_selected()) circle->clicked();
+			}
+			circles->Add(gcnew CCircle(e->X, e->Y));
+			paintBox->Invalidate();
+		}
 	}
 	private: System::Void PaintBox_Paint(System::Object^ sender, System::Windows::Forms::PaintEventArgs^ e) {
 		Bitmap^ b = gcnew Bitmap(paintBox->Width, paintBox->Height);
@@ -147,13 +170,24 @@ namespace CirclesOnForms {
 		}
 	}
 	private: System::Void CirclesPaint_KeyDown(System::Object^ sender, System::Windows::Forms::KeyEventArgs^ e) {
-		CCircle^ object;
-		for each (CCircle ^ circle in circles) {
-			if (circle->color == Color::Blue) {
-				object = circle;
+		if (e->KeyCode == Keys::Delete) {
+			List<CCircle^>^ selectedCircles = gcnew List<CCircle^>;
+			CCircle^ object;
+			for each (CCircle ^ circle in circles) {
+				if (circle->check_selected()) selectedCircles->Add(circle);
+				else object = circle;
 			}
+			for each (CCircle ^ circle in selectedCircles) {
+				circles->Remove(circle);
+			}
+			if (object != nullptr) object->clicked();
 		}
-		circles->Remove(object);
+		if (checkBoxCtrlEnabling->Checked) {
+			if (e->KeyCode == Keys::ControlKey) ctrlPressed = true;
+		}
 	}
-};
+	private: System::Void CirclesPaint_KeyUp(System::Object^ sender, System::Windows::Forms::KeyEventArgs^ e) {
+		if (ctrlPressed && e->KeyCode == Keys::ControlKey) ctrlPressed = false;
+	}
+	};
 }
