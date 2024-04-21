@@ -146,6 +146,17 @@ namespace CirclesOnForms {
 					}
 					object->clicked();
 				}
+				bool temp = false;
+				if (checkBoxIntersactionSelecting->Checked) {
+					for each (CCircle ^ circle in circles) {
+						if (object->circles_intersect(circle) && circle->check_entry() && circle != object) {
+							circle->clicked();
+							if (ctrlPressed) temp = true;
+						}
+					}
+					if (temp) object->clicked();
+					
+				}
 			}
 		}
 		else {
