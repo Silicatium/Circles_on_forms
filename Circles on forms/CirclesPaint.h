@@ -135,27 +135,22 @@ namespace CirclesOnForms {
 			for each (CCircle ^ object in objects) {
 				circles->Remove(object);
 				circles->Add(object);
-				if (object->check_selected() && ctrlPressed) {
-					object->clicked();
-				}
-				else {
-					if (!ctrlPressed) {
-						for each (CCircle ^ circle in circles) {
-							if (circle->check_selected()) circle->clicked();
-						}
+				if (!ctrlPressed) {
+					for each (CCircle ^ circle in circles) {
+						if (circle->check_selected()) circle->clicked();
 					}
-					object->clicked();
 				}
-				bool temp = false;
+				object->clicked();
 				if (checkBoxIntersactionSelecting->Checked) {
 					for each (CCircle ^ circle in circles) {
 						if (object->circles_intersect(circle) && circle->check_entry() && circle != object) {
-							circle->clicked();
-							if (ctrlPressed) temp = true;
+							if (ctrlPressed) { 
+								if (object->check_selected() && !circle->check_selected()) circle->clicked();
+								else if (!object->check_selected() && circle->check_selected()) object->clicked();
+							}
+							else circle->clicked();
 						}
-					}
-					if (temp) object->clicked();
-					
+					}	
 				}
 			}
 		}
