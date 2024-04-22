@@ -95,7 +95,6 @@ namespace CirclesOnForms {
 			this->paintBox->TabStop = false;
 			this->paintBox->Paint += gcnew System::Windows::Forms::PaintEventHandler(this, &CirclesPaint::PaintBox_Paint);
 			this->paintBox->MouseClick += gcnew System::Windows::Forms::MouseEventHandler(this, &CirclesPaint::PaintBox_MouseClick);
-			this->paintBox->MouseMove += gcnew System::Windows::Forms::MouseEventHandler(this, &CirclesPaint::paintBox_MouseMove);
 			// 
 			// CirclesPaint
 			// 
@@ -125,7 +124,7 @@ namespace CirclesOnForms {
 		bool check_act = false;
 		List<CCircle^>^ objects = gcnew List<CCircle^>;
 		for each (CCircle ^ circle in circles) {
-			if (circle->check_entry()) {
+			if (circle->check_entry(e->X, e->Y)) {
 				if (!checkBoxIntersactionSelecting->Checked) objects->Clear();
 				objects->Add(circle);
 				check_act = true;
@@ -143,7 +142,7 @@ namespace CirclesOnForms {
 				object->clicked();
 				if (checkBoxIntersactionSelecting->Checked) {
 					for each (CCircle ^ circle in circles) {
-						if (object->circles_intersect(circle) && circle->check_entry() && circle != object) {
+						if (object->circles_intersect(circle) && circle->check_entry(e->X, e->Y) && circle != object) {
 							if (ctrlPressed) { 
 								if (object->check_selected() && !circle->check_selected()) circle->clicked();
 								else if (!object->check_selected() && circle->check_selected()) object->clicked();
@@ -164,16 +163,13 @@ namespace CirclesOnForms {
 	}
 	private: System::Void PaintBox_Paint(System::Object^ sender, System::Windows::Forms::PaintEventArgs^ e) {
 		Bitmap^ b = gcnew Bitmap(paintBox->Width, paintBox->Height);
+		Graphics^ g = Graphics::FromImage(b);
 		for each (CCircle^ circle in circles) {
-			circle->draw(paintBox, b);
+			circle->draw(g);
+			paintBox->Image = b;
 		}
 		if (circles->Count == 0 && paintBox->Image != nullptr) paintBox->Image = b;
 		one_selected();
-	}
-	private: System::Void paintBox_MouseMove(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
-		for each (CCircle^ circle in circles) {
-			circle->send_mouse_coords(e->X, e->Y);
-		}
 	}
 	private: System::Void CirclesPaint_KeyDown(System::Object^ sender, System::Windows::Forms::KeyEventArgs^ e) {
 		if (e->KeyCode == Keys::Delete) {
