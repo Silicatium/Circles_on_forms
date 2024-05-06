@@ -1,5 +1,4 @@
 #pragma once
-#include <cmath>
 
 using namespace System::Windows::Forms;
 using namespace System::Drawing;
@@ -26,15 +25,12 @@ public:
 		g->DrawEllipse(pen, x - radius, y - radius, 2 * radius, 2 * radius);
 	}
 	bool check_entry(int mouse_X, int mouse_Y) {
-		return (pow(x - mouse_X, 2) + pow(y - mouse_Y, 2)) <= radius * radius;
+		return ((x - mouse_X) * (x - mouse_X) + (y - mouse_Y) * (y - mouse_Y)) <= radius * radius;
 	}
 	void clicked() {
 		selected = !selected;
 	}
 	bool check_selected() {
 		return selected;
-	}
-	bool circles_intersect(CCircle^ c) {
-		return (pow(x - c->x, 2) + pow(y - c->y, 2)) <= pow(radius + c->radius, 2);
 	}
 };

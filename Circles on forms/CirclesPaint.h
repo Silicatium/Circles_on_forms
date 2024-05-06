@@ -122,34 +122,27 @@ namespace CirclesOnForms {
 	private: System::Void PaintBox_MouseClick(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
 		int countList = circles->Count;
 		bool check_act = false;
-		List<CCircle^>^ objects = gcnew List<CCircle^>;
+		CCircle^ object;
 		for each (CCircle ^ circle in circles) {
 			if (circle->check_entry(e->X, e->Y)) {
-				if (!checkBoxIntersactionSelecting->Checked) objects->Clear();
-				objects->Add(circle);
 				check_act = true;
+				object = circle;
 			}
 		}
 		if (check_act) {
-			for each (CCircle ^ object in objects) {
-				circles->Remove(object);
-				circles->Add(object);
-				if (!ctrlPressed) {
-					for each (CCircle ^ circle in circles) {
-						if (circle->check_selected()) circle->clicked();
-					}
-				}
-				object->clicked();
-				if (checkBoxIntersactionSelecting->Checked) {
-					for each (CCircle ^ circle in circles) {
-						if (object->circles_intersect(circle) && circle->check_entry(e->X, e->Y) && circle != object) {
-							if (ctrlPressed) { 
-								if (object->check_selected() && !circle->check_selected()) circle->clicked();
-								else if (!object->check_selected() && circle->check_selected()) object->clicked();
-							}
-							else circle->clicked();
+			circles->Remove(object);
+			circles->Add(object);
+			object->clicked();
+			for each (CCircle ^ circle in circles) {
+				if (!ctrlPressed && circle->check_selected()) circle->clicked();
+				if (circle->check_entry(e->X, e->Y)) {
+					if (checkBoxIntersactionSelecting->Checked) {
+						if (!circle->check_selected() && object != circle) {
+							circle->clicked();
+							if (!object->check_selected()) object->clicked();
 						}
-					}	
+						if (!ctrlPressed) object->clicked();
+					}
 				}
 			}
 		}
