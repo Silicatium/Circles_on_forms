@@ -90,7 +90,7 @@ namespace CirclesOnForms {
 			this->paintBox->BorderStyle = System::Windows::Forms::BorderStyle::FixedSingle;
 			this->paintBox->Location = System::Drawing::Point(12, 38);
 			this->paintBox->Name = L"paintBox";
-			this->paintBox->Size = System::Drawing::Size(763, 503);
+			this->paintBox->Size = System::Drawing::Size(760, 511);
 			this->paintBox->TabIndex = 2;
 			this->paintBox->TabStop = false;
 			this->paintBox->Paint += gcnew System::Windows::Forms::PaintEventHandler(this, &CirclesPaint::PaintBox_Paint);
@@ -101,7 +101,7 @@ namespace CirclesOnForms {
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->BackColor = System::Drawing::Color::GhostWhite;
-			this->ClientSize = System::Drawing::Size(787, 553);
+			this->ClientSize = System::Drawing::Size(784, 561);
 			this->Controls->Add(this->paintBox);
 			this->Controls->Add(this->checkBoxIntersactionSelecting);
 			this->Controls->Add(this->checkBoxCtrlEnabling);
